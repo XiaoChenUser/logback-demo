@@ -1,7 +1,7 @@
-#工程简介  
+# 工程简介  
 这是一个介绍 logback 的使用与核心功能的项目。  
 
-###基本使用
+### 基本使用
 1.引入依赖  
 logback 相关依赖包括：  
 java8: logback 1.3.0 要求 java8.  
@@ -33,7 +33,7 @@ logback-core,logback-classic,logback-access.
 直接将 logback.xml 放在 classpath 目录下。  
 ②spring 工程  
 将 logback.xml 重命名为 logback-spring.xml，放在 classpath 下。  
-##注意：  
+## 注意：  
 logback.xml 中引用了 LOG_DIR 和 APP_NAME 两个变量，需要修改为需要的值！！！  
 
 ### logback 核心功能（配置）说明
@@ -42,7 +42,6 @@ logback.xml 基础结构
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
     <appender>
-        ...
         <encoder></encoder>
         <filter></filter>
     </appender>
