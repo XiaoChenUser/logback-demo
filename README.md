@@ -78,7 +78,7 @@ scanPeriod：扫描的周期，默认 1 分钟，可用单位 milliseconds, seco
 <!-- 外部文件中定义变量：LOG_DIR=log -->
 ```
 
-3.常用 appender
+3.常用 appender  
 ![appender](https://github.com/XiaoChenUser/image-store/raw/main/LogbackTest/common-appender.PNG)  
 AppenderBase: 同步 appender，其子类有 SocketAppender，用于将日志传输到 remote logger server;  
 
@@ -176,4 +176,10 @@ logger(<logger>) 是控制谁（类，package）能打日志。
 ②level：大于等于 level 的都可以输出；  
 ③additivity：true/false，<logger> 是分层的，
 比如：  
-<logger name="com.gree.grih"> 是 <logger name="com.gree.grih.vo"> 的上层，additivity 控制打日志的操作是否向上层 logger 传递，<root> 是顶层 <logger>，假如 additivity=true，且同一个 <appender> 在 <logger> 和 <root> 都出现了，则会造成日志重复打印，additivity=false，name 限定范围内的打印操作只会在本层级 <logger> 执行，不会向上积累。  
+```xml
+<configuration>
+    <logger name="com.gree.grih"></logger>
+    <logger name="com.gree.grih.vo"></logger>
+</configuration>
+```
+ 前者是后者的上层，additivity 控制打日志的操作是否向上层 logger 传递，<root> 是顶层 <logger>，假如 additivity=true，且同一个 <appender> 在 <logger> 和 <root> 都出现了，则会造成日志重复打印，additivity=false，name 限定范围内的打印操作只会在本层级 <logger> 执行，不会向上积累。  
