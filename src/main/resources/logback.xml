@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- scan表示配置改变时，是否重新加载；scanPeriod表示扫描配置文件是否有修改的周期；debug默认为false,表示不打印logback内部日志 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+    <!-- property 或 variable 定义变量，可以在后面的配置中使用"${ }"来引用定义的变量 -->
+<!--    在当前文件中定义变量      -->
+    <property name="LOG_DIR" value="log"/>
+<!--    在 classpath 下的外部资源文件中定义变量     -->
+<!--    <variable resource="resource1.properties"/>-->
+<!--    在外部文件中定义变量      -->
+<!--    <variable file="src/main/java/com/gree/grih/conf/variables1.properties"/>-->
+    <property name="APP_NAME" value="LogbackTest"/>
+    <!-- 当前应用名 -->
+    <contextName>${APP_NAME}</contextName>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level表示日志级别，从左显示5个字符宽度，%logger.%method表示日志产生的类名和方法名，%msg表示日志信息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %boldMagenta(%logger{50}.%method) - [%file:%line] - %cyan(%msg) %n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${LOG_DIR}/log.log</file>
+        <!-- TimeBasedRollingPolicy 实现了 RollingPolicy 和 TriggeringPolicy，所以这里虽然只使用其子类 SizeAndTimeBasedRollingPolicy
+             指定了 RollingPolicy，但其实也指定了 TriggeringPolicy，RollingFileAppender 的 start() 会检查 TriggeringPolicy
+             和 RollingPolicy 是否为 null，可以 debug 查看它们的值，都是 SizeAndTimeBasedRollingPolicy 类型的对象。 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名 -->
+<!--            <FileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd HH}.%i.log.gz</FileNamePattern>-->
+            <FileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!-- 历史日志文件保留数量 -->
+            <MaxHistory>30</MaxHistory>
+            <!-- 每个日志文件的大小 -->
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 所有日志文件的总体大小，需配合 maxHistory 使用 -->
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level表示日志级别，从左显示5个字符宽度，%logger.%method表示日志产生的类名和方法名，%msg表示日志信息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50}.%method - [%file:%line] - %msg %n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <!-- 只记录日志等级大于等于 INFO 的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+    </appender>
+
+    <!-- error独立文件输出 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${LOG_DIR}/error_log.log</file>
+        <!-- TimeBasedRollingPolicy 实现了 RollingPolicy 和 TriggeringPolicy，所以这里虽然只使用其子类 SizeAndTimeBasedRollingPolicy
+             指定了 RollingPolicy，但其实也指定了 TriggeringPolicy -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件名 -->
+            <FileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!-- 日志文件保留天数 -->
+            <MaxHistory>30</MaxHistory>
+            <!-- 每个日志文件的大小 -->
+            <maxFileSize>100MB</maxFileSize>
+            <!-- 所有日志文件的总体大小，需配合 maxHistory 使用 -->
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level表示日志级别，从左显示5个字符宽度，%logger.%method表示日志产生的类名和方法名，%msg表示日志信息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50}.%method - [%file:%line] - %msg %n</pattern>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录ERROR级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- logger 是控制谁（类，package）能打日志， 有 3 个属性，name：必填，可以是包名或者全类名； level：大于等于 level 的都可以输出；
+        additivity：true/false，打日志的操作是否向上级 logger 传递，<root> 是顶级 <logger>，若 additivity=true，且同一个 <appender>
+        在 <logger> 和 <root> 都出现了，则会造成日志重复打印，additivity=false，name 限定范围内的打印操作只会在本级 <logger> 执行，不会
+        向上积累。 -->
+    <logger name="com.gree.grih.vo" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
+
+    <!-- 特殊的 <logger>，顶级的 <logger>，name=ROOT,additivity=false -->
+    <!-- 日志输出级别 -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+</configuration>
+
+        <!-- 关于日志颜色的注意事项：
+            <pattern>%black(控制台-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{10}) - %cyan(%msg%n)</pattern>
+
+            1.第一点，颜色%black %red等等 ，需要用括号将你要显示本颜色的子模块括起来
+
+            2.第二点，%red颜色等，前面要与上一个模块 空格隔开
+
+            3.同样可以定义一个property变量然后直接引用在<pattern>标签中
+
+            4.颜色只用于控制台输出，文件中使用颜色会出现乱码。
+        -->
